@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ForecastAPI.Data.Common.Settings;
 using ForecastAPI.Services;
 using ForecastAPI.Services.Implementations;
 using Microsoft.AspNetCore.Builder;
@@ -28,6 +29,10 @@ namespace ForecastAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var forecastSettings = new ForecastSettings();
+            Configuration.GetSection("ForecastSettings").Bind(forecastSettings);
+            services.AddSingleton(forecastSettings);
+            
             services.AddScoped<IForecastService, ForecastService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>

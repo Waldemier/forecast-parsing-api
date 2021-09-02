@@ -10,14 +10,11 @@ namespace ForecastAPI.Services.Implementations
 {
     public class ForecastService: IForecastService
     {
-        private readonly IConfiguration _configuration;
         private readonly ForecastSettings _forecastSettings;
 
-        public ForecastService(IConfiguration configuration)
+        public ForecastService(ForecastSettings forecastSettings)
         {
-            _configuration = configuration;
-            _forecastSettings = new ForecastSettings();
-            _configuration.GetSection("ForecastSettings").Bind(_forecastSettings);
+            _forecastSettings = forecastSettings;
         }
         
         public async Task<FetchForecast> GetWeather(RequestDto request)
