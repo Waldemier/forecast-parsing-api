@@ -14,20 +14,26 @@ namespace ForecastAPI.Controllers
     public class WeatherForecastController : ControllerBase
     {
         private readonly ILogger<WeatherForecastController> _logger;
-        private readonly IForecastService _forecastService;
+        private readonly IForecastApiService _forecastApiService;
+        private readonly IForecastDbService _forecastDbService;
         
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IForecastService forecastService)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IForecastApiService forecastApiService, IForecastDbService forecastDbService)
         {
             _logger = logger;
-            _forecastService = forecastService;
+            _forecastApiService = forecastApiService;
+            _forecastDbService = forecastDbService;
         }
 
         [HttpGet("forecast")]
-        public async Task<ActionResult<FetchForecast>> Get([FromQuery] RequestDto request) => 
-            Ok(await _forecastService.GetWeatherAsync(request));
+        public async Task<ActionResult<FetchForecast>> Get([FromQuery] RequestDto request)
+        {
+            FetchForecast fetchedForecast = await _forecastApiService.GetWeatherAsync(request);
+            await _forecastDbService.SaveToHistoryAsync(fetchedForecast);
+            return Ok(fetchedForecast);
+        }
 
         [HttpGet("history")]
-        public async Task<ActionResult<IEnumerable<History>>> GetHistory() =>
-            Ok(await _forecastService.GetHistoryAsync());
+        public async Task<ActionResult<IEnumerable<History>>> GetHistory([FromQuery] RequestForHistoryDto requestForHistoryDto) =>
+            Ok(await _forecastDbService.GetHistoryAsync(requestForHistoryDto));
     }
 }

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ForecastAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210903120937_Initial migration")]
-    partial class Initialmigration
+    [Migration("20210903151817_Changed Id property type to guid")]
+    partial class ChangedIdpropertytypetoguid
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,10 +23,9 @@ namespace ForecastAPI.Migrations
 
             modelBuilder.Entity("ForecastAPI.Data.Entities.History", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("City")
                         .IsRequired()
@@ -39,9 +38,6 @@ namespace ForecastAPI.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
 
                     b.ToTable("History");
                 });

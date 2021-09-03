@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ForecastAPI.Migrations
 {
-    public partial class Initialmigration : Migration
+    public partial class ChangedIdpropertytypetoguid : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,8 +11,7 @@ namespace ForecastAPI.Migrations
                 name: "History",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Temperature = table.Column<double>(type: "float", nullable: false),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -21,12 +20,6 @@ namespace ForecastAPI.Migrations
                 {
                     table.PrimaryKey("PK_History", x => x.Id);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_History_Id",
-                table: "History",
-                column: "Id",
-                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

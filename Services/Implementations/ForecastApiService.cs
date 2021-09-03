@@ -12,12 +12,12 @@ using Microsoft.Extensions.Logging;
 
 namespace ForecastAPI.Services.Implementations
 {
-    public class ForecastService: IForecastService
+    public class ForecastApiService: IForecastApiService
     {
         private readonly ForecastSettings _forecastSettings;
         private readonly IHistoryRepository _historyRepository;
-        private readonly ILogger<ForecastService> _logger;
-        public ForecastService(ForecastSettings forecastSettings, IHistoryRepository historyRepository, ILogger<ForecastService> logger)
+        private readonly ILogger<ForecastApiService> _logger;
+        public ForecastApiService(ForecastSettings forecastSettings, IHistoryRepository historyRepository, ILogger<ForecastApiService> logger)
         {
             _forecastSettings = forecastSettings;
             _historyRepository = historyRepository;
@@ -37,28 +37,10 @@ namespace ForecastAPI.Services.Implementations
                 using HttpContent content = httpResponseMessage.Content;
                 FetchForecast data = await content.ReadAsAsync<FetchForecast>();
                 
-                // Save to history table
-                var history = new History(DateTime.Now, data.current.temp_c, data.location.name);
-                await _historyRepository.CreateAsync(history);
-                await _historyRepository.SaveChangesAsync();
-                
                 return data;
             }
 
             return null;
-        }
-
-        public async Task<IEnumerable<History>> GetHistoryAsync()
-        {
-            try
-            {
-                return await _historyRepository.GetAll().ToListAsync();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError($"Database crushed in {nameof(GetHistoryAsync)} action. Exception: {e.Message}");
-                return null;
-            }
         }
     }
 }

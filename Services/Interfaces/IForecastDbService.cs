@@ -6,9 +6,9 @@ using ForecastAPI.Data.Entities;
 
 namespace ForecastAPI.Services
 {
-    public interface IForecastService
+    public interface IForecastDbService
     {
-        Task<FetchForecast> GetWeatherAsync(RequestDto request);
-        Task<IEnumerable<History>> GetHistoryAsync();
+        Task<IEnumerable<History>> GetHistoryAsync(RequestForHistoryDto requestForHistoryDto);
+        Task SaveToHistoryAsync(FetchForecast fetchedForecast);
     }
 }

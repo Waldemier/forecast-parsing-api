@@ -31,7 +31,8 @@ namespace ForecastAPI
             Configuration.GetSection("ForecastSettings").Bind(forecastSettings);
             services.AddSingleton(forecastSettings);
 
-            services.AddScoped<IForecastService, ForecastService>();
+            services.AddScoped<IForecastApiService, ForecastApiService>();
+            services.AddScoped<IForecastDbService, ForecastDbService>();
             services.AddScoped<IHistoryRepository, HistoryRepository>();
             services.AddControllers(opt =>
             {

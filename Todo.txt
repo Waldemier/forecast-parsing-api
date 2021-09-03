@@ -1,4 +1,3 @@
 ﻿- Exception handling (inherit ExceptionFiltering)
-- Db guid ids
-- filtering by temperature
+History:
 - sorting by date
