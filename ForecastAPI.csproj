@@ -7,6 +7,10 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.9">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.9" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
         <PackageReference Include="System.Net.Http.Formatting.Extension" Version="5.2.3" />
@@ -19,10 +23,6 @@
       <_ContentIncludedByDefault Remove="DataAccess\DataAccess\obj\DataAccess.csproj.nuget.dgspec.json" />
       <_ContentIncludedByDefault Remove="DataAccess\DataAccess\obj\project.assets.json" />
       <_ContentIncludedByDefault Remove="DataAccess\DataAccess\obj\project.packagespec.json" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Data\Entities" />
     </ItemGroup>
 
 </Project>

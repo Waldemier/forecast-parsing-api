@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ForecastAPI.Data;
 using ForecastAPI.Data.Dtos;
+using ForecastAPI.Data.Entities;
 using ForecastAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,6 +24,10 @@ namespace ForecastAPI.Controllers
 
         [HttpGet("forecast")]
         public async Task<ActionResult<FetchForecast>> Get([FromQuery] RequestDto request) => 
-            Ok(await _forecastService.GetWeather(request));
+            Ok(await _forecastService.GetWeatherAsync(request));
+
+        [HttpGet("history")]
+        public async Task<ActionResult<IEnumerable<History>>> GetHistory() =>
+            Ok(await _forecastService.GetHistoryAsync());
     }
 }

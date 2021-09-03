@@ -1,18 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using ForecastAPI.Data;
 using ForecastAPI.Data.Common.Settings;
+using ForecastAPI.Repositories.Implementations;
+using ForecastAPI.Repositories.Interfaces;
 using ForecastAPI.Services;
 using ForecastAPI.Services.Implementations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 namespace ForecastAPI
@@ -32,9 +30,25 @@ namespace ForecastAPI
             var forecastSettings = new ForecastSettings();
             Configuration.GetSection("ForecastSettings").Bind(forecastSettings);
             services.AddSingleton(forecastSettings);
-            
+
             services.AddScoped<IForecastService, ForecastService>();
-            services.AddControllers();
+            services.AddScoped<IHistoryRepository, HistoryRepository>();
+            services.AddControllers(opt =>
+            {
+                //opt.Filters.Add(new );
+            });
+
+            services.AddCors(options => options.AddPolicy("CorsPolicy", policy =>
+            {
+                policy.AllowCredentials()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins("http://localhost:3000");
+            }));
+
+            services.AddDbContext<ApplicationDbContext>(options => 
+                options.UseSqlServer(Configuration.GetConnectionString("ForecastDbConnectionString")));
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ForecastAPI", Version = "v1" });
@@ -55,6 +69,8 @@ namespace ForecastAPI
 
             app.UseRouting();
 
+            app.UseCors("CorsPolicy");
+            
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

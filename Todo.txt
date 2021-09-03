@@ -1,3 +1,4 @@
-﻿- Singleton settings
-- Apply database
-- UI
+﻿- Exception handling (inherit ExceptionFiltering)
+- Db guid ids
+- filtering by temperature
+- sorting by date

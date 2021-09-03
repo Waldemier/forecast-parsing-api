@@ -1,12 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ForecastAPI.Data;
-using ForecastAPI.Data.Common.Settings;
 using ForecastAPI.Data.Dtos;
+using ForecastAPI.Data.Entities;
 
 namespace ForecastAPI.Services
 {
     public interface IForecastService
     {
-        Task<FetchForecast> GetWeather(RequestDto request);
+        Task<FetchForecast> GetWeatherAsync(RequestDto request);
+        Task<IEnumerable<History>> GetHistoryAsync();
     }
 }
