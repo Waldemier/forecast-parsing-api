@@ -27,6 +27,7 @@ namespace ForecastAPI.Services.Implementations
         {
             return await _historyRepository.GetAll()
                 .Filtering(requestForHistoryDto)
+                .Sorting(requestForHistoryDto.OrderBy)
                 .ToListAsync();
         }
 

@@ -1,3 +1,1 @@
-﻿- Exception handling (inherit ExceptionFiltering)
-History:
-- sorting by date
+﻿

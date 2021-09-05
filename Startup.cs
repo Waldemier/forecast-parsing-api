@@ -1,5 +1,6 @@
 using ForecastAPI.Data;
 using ForecastAPI.Data.Common.Settings;
+using ForecastAPI.Handlers;
 using ForecastAPI.Repositories.Implementations;
 using ForecastAPI.Repositories.Interfaces;
 using ForecastAPI.Services;
@@ -36,15 +37,17 @@ namespace ForecastAPI
             services.AddScoped<IHistoryRepository, HistoryRepository>();
             services.AddControllers(opt =>
             {
-                //opt.Filters.Add(new );
+                // registered the filter globally
+                opt.Filters.Add(new CustomExceptionFilter());
             });
 
             services.AddCors(options => options.AddPolicy("CorsPolicy", policy =>
             {
-                policy.AllowCredentials()
+                // allow cookies, etc.
+                policy.AllowCredentials() 
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .WithOrigins("http://localhost:3000");
+                    .WithOrigins(Configuration["Frontend:Url"]);
             }));
 
             services.AddDbContext<ApplicationDbContext>(options => 

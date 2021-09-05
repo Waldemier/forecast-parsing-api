@@ -6,5 +6,6 @@ namespace ForecastAPI.Data.Dtos
     {
         public double Max { get; set; } = Double.MaxValue;
         public double Min { get; set; } = Double.MinValue;
+        public string OrderBy { get; set; } = "Asc";
     }
 }
