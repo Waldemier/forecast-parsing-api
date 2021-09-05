@@ -14,8 +14,9 @@ namespace ForecastAPI.Handlers
             var controller = context.RouteData.Values["controller"];
             string exceptionStackTrace = context.Exception.StackTrace;
             string exceptionMessage = context.Exception.Message;
-
-            var exception = new GlobalException(actionName, controller, exceptionStackTrace, exceptionMessage);
+            int internalServerErrorStatusCode = 500;
+            
+            var exception = new GlobalException(actionName, controller, exceptionStackTrace, exceptionMessage, internalServerErrorStatusCode);
             context.Result = new JsonResult(exception);
             
             return Task.CompletedTask;

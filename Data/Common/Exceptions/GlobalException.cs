@@ -8,13 +8,15 @@ namespace ForecastAPI.Data.Common.Exceptions
         public object Controller { get; }
         public string StackTrace { get; }
         public string Message { get; }
-
-        public GlobalException(string action, object controller, string stackTrace, string message)
+        public int StatusCode { get; }
+        
+        public GlobalException(string action, object controller, string stackTrace, string message, int statusCode)
         {
             Action = action;
             Controller = controller;
             StackTrace = stackTrace;
             Message = message;
+            StatusCode = statusCode;
         }
 
         public override string ToString()
