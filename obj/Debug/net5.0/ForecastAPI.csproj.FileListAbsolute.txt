@@ -62,3 +62,6 @@ E:\VSProjects\ForecastAPI\bin\Debug\net5.0\System.Net.Http.Formatting.dll
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\System.Net.Http.Primitives.dll
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\Humanizer.dll
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.Design.dll
+E:\VSProjects\ForecastAPI\bin\Debug\net5.0\AutoMapper.dll
+E:\VSProjects\ForecastAPI\bin\Debug\net5.0\BCrypt.Net-Next.dll
+E:\VSProjects\ForecastAPI\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

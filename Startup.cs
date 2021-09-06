@@ -3,11 +3,12 @@ using ForecastAPI.Data.Common.Settings;
 using ForecastAPI.Handlers;
 using ForecastAPI.Repositories.Implementations;
 using ForecastAPI.Repositories.Interfaces;
+using ForecastAPI.Security.Extensions;
+using ForecastAPI.Security.Settings;
 using ForecastAPI.Services;
 using ForecastAPI.Services.Implementations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,9 +33,17 @@ namespace ForecastAPI
             Configuration.GetSection("ForecastSettings").Bind(forecastSettings);
             services.AddSingleton(forecastSettings);
 
+            var jwtSettings = new JwtSettings();
+            Configuration.GetSection("JwtSettings").Bind(jwtSettings);
+            services.AddSingleton(jwtSettings);
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IForecastApiService, ForecastApiService>();
             services.AddScoped<IForecastDbService, ForecastDbService>();
             services.AddScoped<IHistoryRepository, HistoryRepository>();
+            services.AddSecurityServices();
+            
             services.AddControllers(opt =>
             {
                 // registered the filter globally
@@ -52,6 +61,8 @@ namespace ForecastAPI
 
             services.AddDbContext<ApplicationDbContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("ForecastDbConnectionString")));
+            
+            services.ConfigureJsonWebToken(jwtSettings);
             
             services.AddSwaggerGen(c =>
             {
@@ -74,7 +85,8 @@ namespace ForecastAPI
             app.UseRouting();
 
             app.UseCors("CorsPolicy");
-            
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

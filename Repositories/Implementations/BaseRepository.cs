@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using ForecastAPI.Data;
 using ForecastAPI.Repositories.Interfaces;
@@ -13,19 +15,25 @@ namespace ForecastAPI.Repositories.Implementations
             _context = context;
         }
         
-        public async Task CreateAsync(T entity)
-        {
+        public async Task CreateAsync(T entity) => 
             await _context.Set<T>().AddAsync(entity);
-        }
 
-        public IQueryable<T> GetAll()
-        {
-            return _context.Set<T>();
-        }
+        public void Update(T entity) =>
+            _context.Set<T>().Update(entity);
 
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _context.SaveChangesAsync();
-        }
+        public void Remove(T entity) =>
+            _context.Set<T>().Remove(entity);
+
+        public IQueryable<T> GetByCondition(Expression<Func<T, bool>> condition) =>
+            _context.Set<T>().Where(condition);
+        
+        public bool CheckByCondition(Expression<Func<T, bool>> condition) =>
+            _context.Set<T>().Any(condition);
+        
+        public IQueryable<T> GetAll() =>
+            _context.Set<T>();
+
+        public async Task<int> SaveChangesAsync() =>
+             await _context.SaveChangesAsync();
     }
 }
