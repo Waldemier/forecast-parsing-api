@@ -70,21 +70,24 @@ namespace ForecastAPI.Security.Services.Implementations
         public async Task<AuthenticateCustom> Refresh(RefreshCredentials refreshCredentials)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
+            
             var claimsPrincipal = tokenHandler.ValidateToken(refreshCredentials.JwtToken,
                 new TokenValidationParameters
                 {
+                    ValidAudience = _jwtSettings.ValidAudience,
+                    ValidIssuer = _jwtSettings.ValidIssuer,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
+
                     ValidateAudience = true,
                     ValidateIssuer = true,
                     ValidateIssuerSigningKey = true,
-                    ValidateLifetime = false,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret))
+                    ValidateLifetime = false
                 }, 
                 out SecurityToken validatedToken);
             
             var jwtToken = validatedToken as JwtSecurityToken;
             
-            if (jwtToken == null || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature,
-                StringComparison.InvariantCultureIgnoreCase))
+            if (jwtToken == null || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256))
             {
                 throw new SecurityTokenException("Received token is invalid");
             }
@@ -106,7 +109,7 @@ namespace ForecastAPI.Security.Services.Implementations
             if (refreshTokenInstance.UserId != Id)
                 throw new SecurityTokenException("Received refresh token doesn't belong to the received user");
 
-            if (refreshTokenInstance.ExpiryTime < DateTime.Now)
+            if (refreshTokenInstance.ExpiryTime < DateTime.UtcNow)
             {
                 _refreshTokenRepository.Remove(refreshTokenInstance);
                 await _refreshTokenRepository.SaveChangesAsync();
@@ -178,9 +181,9 @@ namespace ForecastAPI.Security.Services.Implementations
         {
             var randomNumber = new byte[32]; // by default like [0,0,0,0,0,0,0,0, ...]
             using var randomNumberGenerator = RandomNumberGenerator.Create();
-            randomNumberGenerator.GetBytes(randomNumber);
+            randomNumberGenerator.GetBytes(randomNumber); // after that array looks like [34, 178, 117, 114, 114, 87, 9, 4, 40, ...]
 
-            return Convert.ToBase64String(randomNumber);
+            return Convert.ToBase64String(randomNumber); // after that array transforms to string
         }
     }
 }

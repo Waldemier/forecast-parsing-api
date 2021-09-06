@@ -4,8 +4,6 @@ crud, and all the security part
 
 * To ask about challenge schema
 
-- Test the refresh action and expired situation
-
 ============
 
 Headers:

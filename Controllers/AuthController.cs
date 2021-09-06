@@ -13,7 +13,6 @@ using Microsoft.IdentityModel.Tokens;
 namespace ForecastAPI.Controllers
 {
     [ApiController]
-    [Authorize]
     [Route("api/[controller]")]
     public class AuthController: ControllerBase
     {
@@ -27,7 +26,6 @@ namespace ForecastAPI.Controllers
         }
 
         [HttpPost("login")]
-        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var userExisting = _userRepository.CheckUserExistsByEmail(loginDto.Email);
@@ -70,7 +68,6 @@ namespace ForecastAPI.Controllers
         }
 
         [HttpPost("register")]
-        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             if (_userRepository.CheckUserExistsByEmail(registerDto.Email))
@@ -92,14 +89,12 @@ namespace ForecastAPI.Controllers
         }
 
         [HttpPost("refresh")]
-        // cause the refresh token might have expired by time
-        [AllowAnonymous] 
         public async Task<IActionResult> Refresh()
         {
             if (!HttpContext.Request.Cookies.ContainsKey("access_token") ||
                 !HttpContext.Request.Cookies.ContainsKey("refresh_token"))
             {
-                throw new SecurityTokenException("One of the tokens doesn't exists. Try to go back in the system.");
+                throw new SecurityTokenException("One of the tokens doesn't exists. Maybe your refresh token had been expired. Try to go back in the system.");
             }
 
             var refreshCredentials = new RefreshCredentials
@@ -144,7 +139,8 @@ namespace ForecastAPI.Controllers
                 HttpContext.Response.Cookies.Delete("access_token");
             if(HttpContext.Request.Cookies.ContainsKey("refresh_token")) 
                 HttpContext.Response.Cookies.Delete("refresh_token");
-
+            
+            // anyway if cookies doesn't exist - "Ok" status will return
             return Ok();
         }
     }
