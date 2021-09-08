@@ -8,14 +8,19 @@ namespace ForecastAPI.Data.Entities
         public DateTime Date { get; set; }
         public double Temperature { get; set; }
         public string City { get; set; }
+        
+        public Guid UserId { get; set; }
+        
+        public User User { get; set; }
 
         public History() { }
         
-        public History(DateTime date, double temperature, string city)
+        public History(DateTime date, double temperature, string city, Guid userId)
         {
             this.Date = date;
             this.Temperature = temperature;
             this.City = city;
+            this.UserId = userId;
         }
     }
 }

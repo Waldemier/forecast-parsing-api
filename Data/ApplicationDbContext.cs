@@ -28,6 +28,10 @@ namespace ForecastAPI.Data
                     .IsRequired();
                 entity.Property(e => e.City)
                     .IsRequired();
+
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.History)
+                    .HasForeignKey(e => e.UserId);
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -64,9 +68,9 @@ namespace ForecastAPI.Data
                 entity.HasOne(e => e.User)
                     .WithOne()
                     .HasForeignKey<RefreshToken>(e => e.UserId);
-
-                modelBuilder.ApplyConfiguration(new SeedUsers());
             });
+            
+            modelBuilder.ApplyConfiguration(new SeedUsers());
         }
     }
 }

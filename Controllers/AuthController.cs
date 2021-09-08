@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
+using ForecastAPI.ActionFilters;
 using ForecastAPI.Data.Dtos;
 using ForecastAPI.Data.Entities;
 using ForecastAPI.Data.Enums;
 using ForecastAPI.Repositories.Interfaces;
 using ForecastAPI.Security.Models;
 using ForecastAPI.Security.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -25,7 +25,7 @@ namespace ForecastAPI.Controllers
             _userRepository = userRepository;
         }
 
-        [HttpPost("login")]
+        [HttpPost("login"), ServiceFilter(typeof(ValidationRequestsFilter))]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var userExisting = _userRepository.CheckUserExistsByEmail(loginDto.Email);
@@ -49,7 +49,7 @@ namespace ForecastAPI.Controllers
                 new CookieOptions
                 {
                     HttpOnly = false,
-                    Secure = true,
+                    Secure = true, // ssl only / put in *true
                     SameSite = SameSiteMode.Strict
                 });
             
@@ -59,15 +59,15 @@ namespace ForecastAPI.Controllers
                 new CookieOptions
                 {
                     HttpOnly = true, // Cant be used on the client side (js)
-                    Secure = true, // ssl only
+                    Secure = true, // ssl only / put in *true
                     SameSite = SameSiteMode.Strict, // requests with the same site only, which means that the cookies won't be fetched from another domain
                     Expires = tokens.RefreshTokenExpiryTime // lives while cookie won't be expiring
                 });
 
-            return Ok(new { message = "You registered successfully." });
+            return Ok(new { message = "You logged successfully." });
         }
 
-        [HttpPost("register")]
+        [HttpPost("register"), ServiceFilter(typeof(ValidationRequestsFilter))]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             if (_userRepository.CheckUserExistsByEmail(registerDto.Email))
@@ -114,7 +114,7 @@ namespace ForecastAPI.Controllers
                 new CookieOptions
                 {
                     HttpOnly = false,
-                    Secure = true,
+                    Secure = true, // ssl only / put in *true
                     SameSite = SameSiteMode.Strict
                 });
             
@@ -124,7 +124,7 @@ namespace ForecastAPI.Controllers
                 new CookieOptions
                 {
                     HttpOnly = true, // Cant be used on the client side (js)
-                    Secure = true, // ssl only
+                    Secure = true, // ssl only / put in *true
                     SameSite = SameSiteMode.Strict, // requests with the same site only, which means that the cookies won't be fetched from another domain
                     Expires = tokens.RefreshTokenExpiryTime // lives while cookie won't be expiring
                 });

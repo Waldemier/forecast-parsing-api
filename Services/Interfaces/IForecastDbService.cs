@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ForecastAPI.Data;
 using ForecastAPI.Data.Dtos;
@@ -9,6 +10,7 @@ namespace ForecastAPI.Services
     public interface IForecastDbService
     {
         Task<IEnumerable<History>> GetHistoryAsync(RequestForHistoryDto requestForHistoryDto);
-        Task SaveToHistoryAsync(FetchForecast fetchedForecast);
+        Task<IEnumerable<History>> GetHistoryForSpecificUser(RequestForHistoryDto requestForHistoryDto, Guid userId);
+        Task SaveToHistoryAsync(FetchForecast fetchedForecast, Guid userId);
     }
 }

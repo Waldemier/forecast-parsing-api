@@ -35,7 +35,12 @@ namespace ForecastAPI.Migrations
                     b.Property<double>("Temperature")
                         .HasColumnType("float");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("History");
                 });
@@ -103,7 +108,7 @@ namespace ForecastAPI.Migrations
                             Id = new Guid("80abbca8-664d-4b20-b5de-024705497d4a"),
                             Email = "admin@brainence.com",
                             Name = "Admin",
-                            Password = "$2a$11$C4ET8f6NfM/t7eJJ8hG8deSGsx/4y3B8ut7Onv4ID11hWOUziUQy6",
+                            Password = "$2a$11$/zjIoeJR.b.ZHBazAbNxhOajXirX.XAu9frk5o7Vto3tsbJChC3OC",
                             Role = 0
                         },
                         new
@@ -111,7 +116,7 @@ namespace ForecastAPI.Migrations
                             Id = new Guid("86dba8c0-d178-41e7-938c-ed49778fb52a"),
                             Email = "admin2@brainence.com",
                             Name = "Admin2",
-                            Password = "$2a$11$AHeCsg0BcSkFbG8Nge4aA.c8mSmSncftTmpCGK7kN4QtUg7aq6lc.",
+                            Password = "$2a$11$SNXX.S.E.jPNMnBDrnuYC.JHdVbTTw.hmWB3L7E9vaXlTGVBpEkmO",
                             Role = 0
                         },
                         new
@@ -119,7 +124,7 @@ namespace ForecastAPI.Migrations
                             Id = new Guid("021ca3c1-0deb-4afd-ae94-2159a8479811"),
                             Email = "mark@brainence.com",
                             Name = "Mark",
-                            Password = "$2a$11$ubNfpuPaWrXYTSbG7H05n.e70WfFE9kYCxF6KbZzcJAg4DlfMxmb2",
+                            Password = "$2a$11$OjxBFK8nKLe2jfBMQBHqLemmkFnd2JouedTpHgKUtfIhawTFiLbj2",
                             Role = 1
                         },
                         new
@@ -127,9 +132,20 @@ namespace ForecastAPI.Migrations
                             Id = new Guid("c9d4c053-49b6-410c-bc78-2d54a9991870"),
                             Email = "iryna@brainence.com",
                             Name = "Iryna",
-                            Password = "$2a$11$YRTE221fcY/XGTI5LnEaKu/a6cHHdyew0PlH/6OjN8f1x/DOzofTG",
+                            Password = "$2a$11$ThbdNQX5XqYRbLZNs/nFzeXHe2O93GNNa.7Ud1FTHnMYEOYJkBDuy",
                             Role = 1
                         });
+                });
+
+            modelBuilder.Entity("ForecastAPI.Data.Entities.History", b =>
+                {
+                    b.HasOne("ForecastAPI.Data.Entities.User", "User")
+                        .WithMany("History")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ForecastAPI.Data.Entities.RefreshToken", b =>
@@ -141,6 +157,11 @@ namespace ForecastAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ForecastAPI.Data.Entities.User", b =>
+                {
+                    b.Navigation("History");
                 });
 #pragma warning restore 612, 618
         }

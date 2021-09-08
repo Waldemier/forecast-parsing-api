@@ -2,8 +2,6 @@
 new refresh token repository, 
 crud, and all the security part
 
-* To ask about challenge schema
-
 ============
 
 Headers:

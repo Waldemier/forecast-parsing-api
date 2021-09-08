@@ -1,14 +1,18 @@
+using ForecastAPI.ActionFilters;
 using ForecastAPI.Data;
 using ForecastAPI.Data.Common.Settings;
 using ForecastAPI.Handlers;
 using ForecastAPI.Repositories.Implementations;
 using ForecastAPI.Repositories.Interfaces;
 using ForecastAPI.Security.Extensions;
+using ForecastAPI.Security.Services.Implementations;
+using ForecastAPI.Security.Services.Interfaces;
 using ForecastAPI.Security.Settings;
 using ForecastAPI.Services;
 using ForecastAPI.Services.Implementations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,12 +41,22 @@ namespace ForecastAPI
             Configuration.GetSection("JwtSettings").Bind(jwtSettings);
             services.AddSingleton(jwtSettings);
 
+            // Configure options for api controllers
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+            
+            services.AddScoped<ValidationRequestsFilter>();
+            
+            services.AddScoped<IClaimsService, ClaimsService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IForecastApiService, ForecastApiService>();
             services.AddScoped<IForecastDbService, ForecastDbService>();
             services.AddScoped<IHistoryRepository, HistoryRepository>();
             services.AddSecurityServices();
+            services.AddHttpContextAccessor();
             
             services.AddControllers(opt =>
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ForecastAPI.Data.Enums;
 
 namespace ForecastAPI.Data.Entities
@@ -10,5 +11,7 @@ namespace ForecastAPI.Data.Entities
         public string Email { get; set; }
         public string Password { get; set; }
         public RoleTypes Role { get; set; }
+        
+        public IQueryable<History> History { get; set; }
     }
 }

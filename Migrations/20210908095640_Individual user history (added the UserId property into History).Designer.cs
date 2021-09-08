@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ForecastAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210906114230_Initial")]
-    partial class Initial
+    [Migration("20210908095640_Individual user history (added the UserId property into History)")]
+    partial class IndividualuserhistoryaddedtheUserIdpropertyintoHistory
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,7 +37,12 @@ namespace ForecastAPI.Migrations
                     b.Property<double>("Temperature")
                         .HasColumnType("float");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("History");
                 });
@@ -100,6 +105,17 @@ namespace ForecastAPI.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("ForecastAPI.Data.Entities.History", b =>
+                {
+                    b.HasOne("ForecastAPI.Data.Entities.User", "User")
+                        .WithMany("History")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ForecastAPI.Data.Entities.RefreshToken", b =>
                 {
                     b.HasOne("ForecastAPI.Data.Entities.User", "User")
@@ -109,6 +125,11 @@ namespace ForecastAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ForecastAPI.Data.Entities.User", b =>
+                {
+                    b.Navigation("History");
                 });
 #pragma warning restore 612, 618
         }

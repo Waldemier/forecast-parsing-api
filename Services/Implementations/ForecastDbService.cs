@@ -31,9 +31,17 @@ namespace ForecastAPI.Services.Implementations
                 .ToListAsync();
         }
 
-        public async Task SaveToHistoryAsync(FetchForecast fetchedForecast)
+        public async Task<IEnumerable<History>> GetHistoryForSpecificUser(RequestForHistoryDto requestForHistoryDto, Guid userId)
         {
-            var history = new History(DateTime.Now, fetchedForecast.current.temp_c, fetchedForecast.location.name);
+            return await _historyRepository.GetByCondition(x => x.UserId.Equals(userId))
+                .Filtering(requestForHistoryDto)
+                .Sorting(requestForHistoryDto.OrderBy)
+                .ToListAsync();
+        }
+
+        public async Task SaveToHistoryAsync(FetchForecast fetchedForecast, Guid userId)
+        {
+            var history = new History(DateTime.Now, fetchedForecast.current.temp_c, fetchedForecast.location.name, userId);
             await _historyRepository.CreateAsync(history);
             await _historyRepository.SaveChangesAsync();
         }
