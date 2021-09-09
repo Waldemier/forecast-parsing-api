@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using ForecastAPI.ActionFilters;
 using ForecastAPI.Data;
 using ForecastAPI.Data.Dtos;
 using ForecastAPI.Data.Entities;
 using ForecastAPI.Data.Enums;
+using ForecastAPI.Handlers;
 using ForecastAPI.Security.Extensions;
 using ForecastAPI.Security.Services.Interfaces;
 using ForecastAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Extensions;
 
 namespace ForecastAPI.Controllers
 {
@@ -31,7 +30,7 @@ namespace ForecastAPI.Controllers
             _claimsService = claimsService;
         }
 
-        [HttpGet("forecast"), CustomAuthorizeAttribute(RoleTypes.SystemUser, RoleTypes.Admin), ServiceFilter(typeof(ValidationRequestsFilter))]
+        [HttpGet("forecast"), CustomAuthorizeAttribute(RoleTypes.SystemUser, RoleTypes.Admin), ServiceFilter(typeof(ValidationRequestFilter))]
         public async Task<ActionResult<FetchForecast>> Get([FromQuery] RequestDto request)
         {
             FetchForecast fetchedForecast = await _forecastApiService.GetWeatherAsync(request);
@@ -39,7 +38,7 @@ namespace ForecastAPI.Controllers
             return Ok(fetchedForecast);
         }
 
-        [HttpGet("history"), CustomAuthorizeAttribute(RoleTypes.SystemUser, RoleTypes.Admin), ServiceFilter(typeof(ValidationRequestsFilter))]
+        [HttpGet("history"), CustomAuthorizeAttribute(RoleTypes.SystemUser, RoleTypes.Admin), ServiceFilter(typeof(ValidationRequestFilter))]
         public async Task<ActionResult<IEnumerable<History>>> GetHistory(
             [FromQuery] RequestForHistoryDto requestForHistoryDto) => 
             Ok(await _forecastDbService.GetHistoryForSpecificUser(requestForHistoryDto, _claimsService.GetUserIdFromContextClaims()));

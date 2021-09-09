@@ -23,21 +23,18 @@ namespace ForecastAPI.Services.Implementations
         }
         
         
-        public async Task<IEnumerable<History>> GetHistoryAsync(RequestForHistoryDto requestForHistoryDto)
-        {
-            return await _historyRepository.GetAll()
+        public async Task<IEnumerable<History>> GetHistoryAsync(RequestForHistoryDto requestForHistoryDto) => 
+            await _historyRepository.GetAll()
                 .Filtering(requestForHistoryDto)
                 .Sorting(requestForHistoryDto.OrderBy)
                 .ToListAsync();
-        }
 
-        public async Task<IEnumerable<History>> GetHistoryForSpecificUser(RequestForHistoryDto requestForHistoryDto, Guid userId)
-        {
-            return await _historyRepository.GetByCondition(x => x.UserId.Equals(userId))
+        public async Task<IEnumerable<History>> GetHistoryForSpecificUser(RequestForHistoryDto requestForHistoryDto, Guid userId) =>
+            await _historyRepository.GetByCondition(x => x.UserId.Equals(userId))
                 .Filtering(requestForHistoryDto)
                 .Sorting(requestForHistoryDto.OrderBy)
                 .ToListAsync();
-        }
+
 
         public async Task SaveToHistoryAsync(FetchForecast fetchedForecast, Guid userId)
         {

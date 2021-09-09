@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace ForecastAPI.Handlers
 {
-    // To ask about production
     public class CustomExceptionFilter: ExceptionFilterAttribute // analogy is IAsyncExceptionFilter or IExceptionFilter
     {
         public override Task OnExceptionAsync(ExceptionContext context)

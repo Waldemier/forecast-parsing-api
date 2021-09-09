@@ -1,14 +1,16 @@
 ﻿using System.Threading.Tasks;
-using ForecastAPI.ActionFilters;
+using AutoMapper;
 using ForecastAPI.Data.Dtos;
 using ForecastAPI.Data.Entities;
 using ForecastAPI.Data.Enums;
+using ForecastAPI.Handlers;
 using ForecastAPI.Repositories.Interfaces;
 using ForecastAPI.Security.Models;
 using ForecastAPI.Security.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace ForecastAPI.Controllers
 {
@@ -18,26 +20,33 @@ namespace ForecastAPI.Controllers
     {
         private readonly ISecurityService _securityService;
         private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
         
-        public AuthController(ISecurityService securityService, IUserRepository userRepository)
+        public AuthController(ISecurityService securityService, IUserRepository userRepository, IMapper mapper)
         {
             _securityService = securityService;
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
-        [HttpPost("login"), ServiceFilter(typeof(ValidationRequestsFilter))]
+        [HttpPost("login"), ServiceFilter(typeof(ValidationRequestFilter))]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var userExisting = _userRepository.CheckUserExistsByEmail(loginDto.Email);
+
             if (!userExisting)
-                return NotFound("Incorrect wrote data.");
-            
+            {
+               return new NotFoundObjectResult("Wrong received data. User with current email doesn't exist.");
+            }
+
             var userInstance = await _userRepository.GetByEmailAsync(loginDto.Email);
-
             var passwordValid = BCrypt.Net.BCrypt.Verify(loginDto.Password, userInstance.Password);
+            
             if (!passwordValid)
-                return BadRequest("Incorrect wrote data.");
-
+            {
+                return new BadRequestObjectResult("Incorrect wrote data.");
+            }
+                
             var tokens = await _securityService.Authenticate(userInstance);
 
             if (tokens == null)
@@ -64,25 +73,30 @@ namespace ForecastAPI.Controllers
                     Expires = tokens.RefreshTokenExpiryTime // lives while cookie won't be expiring
                 });
 
-            return Ok(new { message = "You logged successfully." });
+            var userToResponse = _mapper.Map<UserToResponseDto>(userInstance);
+            
+            return Ok(new { message = "You logged successfully.", user = JsonConvert.SerializeObject(userToResponse) });
         }
 
-        [HttpPost("register"), ServiceFilter(typeof(ValidationRequestsFilter))]
+        [HttpPost("register"), ServiceFilter(typeof(ValidationRequestFilter))]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            if (_userRepository.CheckUserExistsByEmail(registerDto.Email))
-                return BadRequest("User with current email already exist.");
-
+            var userExisting = _userRepository.CheckUserExistsByEmail(registerDto.Email);
+            if (userExisting)
+            {
+                return new BadRequestObjectResult("User with current email already exist.");
+            }
+            
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
-            var user = new User
+            var userInstanceToSaveInDb = new User
             {
                 Name = registerDto.Name,
                 Email = registerDto.Email,
                 Password = hashedPassword,
                 Role = RoleTypes.SystemUser
             };
-
-            await _userRepository.CreateAsync(user);
+                
+            await _userRepository.CreateAsync(userInstanceToSaveInDb);
             await _userRepository.SaveChangesAsync();
 
             return Created(string.Empty, new { message = "User created successfully." });

@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using ForecastAPI.Data.Dtos;
 using ForecastAPI.Data.Entities;
+using System.Linq.Dynamic.Core;
+using System.Reflection;
 
 namespace ForecastAPI.Extensions
 {
     public static class HistoryExtensions
     {
+        private static string[] ORDERING_BY = new[] { "ASC", "DESC" };
         public static IQueryable<History> Filtering(this IQueryable<History> collection, RequestForHistoryDto requestForHistoryDto)
         {
             return collection
@@ -16,11 +18,12 @@ namespace ForecastAPI.Extensions
 
         public static IQueryable<History> Sorting(this IQueryable<History> collection, string orderByQueryString)
         {
-            if (orderByQueryString.Equals("Desc", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return collection.OrderByDescending(x => x.Date);
-            }
-            return collection.OrderBy(x => x.Date);
+            orderByQueryString = ORDERING_BY.SingleOrDefault(
+                x => x.Equals(orderByQueryString, StringComparison.InvariantCultureIgnoreCase)) ?? "ASC"; 
+            
+            var dateProperty = typeof(History).GetProperty("Date", BindingFlags.Instance | BindingFlags.Public);
+            string orderingQuery = $"{dateProperty.Name} {orderByQueryString}";
+            return collection.OrderBy(orderingQuery);
         }
     }
 }

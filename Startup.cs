@@ -1,4 +1,4 @@
-using ForecastAPI.ActionFilters;
+using System.Reflection;
 using ForecastAPI.Data;
 using ForecastAPI.Data.Common.Settings;
 using ForecastAPI.Handlers;
@@ -46,8 +46,10 @@ namespace ForecastAPI
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
-            
-            services.AddScoped<ValidationRequestsFilter>();
+
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddScoped<ValidationUserExistingFilter>();
+            services.AddScoped<ValidationRequestFilter>();
             
             services.AddScoped<IClaimsService, ClaimsService>();
             services.AddScoped<IUserRepository, UserRepository>();
@@ -62,7 +64,7 @@ namespace ForecastAPI
             {
                 // registered the filter globally
                 opt.Filters.Add(new CustomExceptionFilter());
-            });
+            }).AddNewtonsoftJson();
 
             services.AddCors(options => options.AddPolicy("CorsPolicy", policy =>
             {
