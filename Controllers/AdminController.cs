@@ -19,27 +19,36 @@ namespace ForecastAPI.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public AdminController(IUserRepository userRepository, IMapper mapper)
+        private readonly IHistoryRepository _historyRepository;
+        public AdminController(IUserRepository userRepository, IMapper mapper, IHistoryRepository historyRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _historyRepository = historyRepository;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers([FromQuery]UsersRequestParameters usersRequestParameters) // ?PageSize=..&PageNumber=..
         {
-            var users = await _userRepository.GetAllUsers();
+            var users = await _userRepository.GetAllUsers(usersRequestParameters);
+            HttpContext.Response.Headers.Add("X-Pagination", users.MetaData);
+            
             var userDtos = _mapper.Map<IEnumerable<UserToResponseDto>>(users);
 
             return Ok(userDtos);
         }
 
         [HttpGet("{userId:Guid}"), ServiceFilter(typeof(ValidationUserExistingFilter))]
-        public async Task<IActionResult> GetHistoryForSpecificUser(Guid userId)
+        public async Task<IActionResult> GetHistoryForSpecificUser(Guid userId, [FromQuery] HistoryRequestParameters historyRequestParameters)
         {
             var user = await _userRepository.GetInstanceByIdAsync(userId);
             await _userRepository.LoadHistoryForSpecificUserAsync(user);
-            var historyDto = _mapper.Map<IEnumerable<HistoryToResponseDto>>(user.History);
+            var paginatedHistory = _historyRepository.PaginateHistory(user.History, historyRequestParameters);
+            
+            HttpContext.Response.Headers.Add("X-History-Pagination", paginatedHistory.MetaData);
+            
+            var historyDto = _mapper.Map<IEnumerable<HistoryToResponseDto>>(paginatedHistory);
+            
             return Ok(historyDto);
         }
 

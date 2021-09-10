@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ForecastAPI.Data.Dtos
+﻿namespace ForecastAPI.Data.Dtos
 {
     public class RequestForHistoryDto
     {

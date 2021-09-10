@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ForecastAPI.Data;
+using ForecastAPI.Data.Common.Pagination;
+using ForecastAPI.Data.Dtos;
 using ForecastAPI.Data.Entities;
 using ForecastAPI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -22,8 +24,11 @@ namespace ForecastAPI.Repositories.Implementations
         public bool CheckUserExistsByEmail(string email) =>
             CheckByCondition(x => x.Email.Equals(email));
 
-        public async Task<IEnumerable<User>> GetAllUsers() =>
-            await GetAll().ToListAsync();
+        public async Task<PagedList<User>> GetAllUsers(UsersRequestParameters usersRequestParameters)
+        {
+            var users =  await GetAll().ToListAsync();
+            return PagedList<User>.ToPagedList(users, usersRequestParameters.PageNumber, usersRequestParameters.PageSize);
+        }
 
         public bool CheckUserExistsById(Guid Id) =>
             CheckByCondition(x => x.Id.Equals(Id));
@@ -34,9 +39,14 @@ namespace ForecastAPI.Repositories.Implementations
         public async Task CreateANewUserInstance(User user) =>
             await CreateAsync(user);
         
+        /// <summary>
+        /// Load history by explicit loading approach
+        /// </summary>
+        /// <param name="user">Instance type of User</param>
         public async Task LoadHistoryForSpecificUserAsync(User user) =>
             await _context.Entry(user)
                 .Collection(c => c.History)
+                .Query()
                 .LoadAsync();
 
         public void DeleteUser(User user) => Remove(user);
