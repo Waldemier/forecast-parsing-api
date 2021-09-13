@@ -4,9 +4,10 @@
     {
         private const int MAX_PAGE_SIZE = 25;
 
-        private int _defaultPageSize = 15;
+        private int _defaultPageSize = 7;
         
         private int _defaultPageNumber = 1;
+        
         public override int PageSize
         {
             get => _defaultPageSize;

@@ -52,16 +52,7 @@ namespace ForecastAPI.Controllers
             if (tokens == null)
                 return Unauthorized();
             
-            HttpContext.Response.Cookies.Append(
-                "access_token",
-                tokens.JwtToken,
-                new CookieOptions
-                {
-                    HttpOnly = false,
-                    Secure = true, // ssl only / put in *true
-                    SameSite = SameSiteMode.Strict
-                });
-            
+            // Now, an access token stored in localStorage, and at the cookie stored a refresh token only
             HttpContext.Response.Cookies.Append(
                 "refresh_token",
                 tokens.RefreshToken,
@@ -75,7 +66,7 @@ namespace ForecastAPI.Controllers
 
             var userToResponse = _mapper.Map<UserToResponseDto>(userInstance);
             
-            return Ok(new { message = "You logged successfully.", user = JsonConvert.SerializeObject(userToResponse) });
+            return Ok(new {  message = "You logged successfully.", access_token = tokens.JwtToken, user = JsonConvert.SerializeObject(userToResponse) });
         }
 
         [HttpPost("register"), ServiceFilter(typeof(ValidationRequestFilter))]
@@ -103,17 +94,16 @@ namespace ForecastAPI.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh()
+        public async Task<IActionResult> Refresh(RefreshDto refreshDto)
         {
-            if (!HttpContext.Request.Cookies.ContainsKey("access_token") ||
-                !HttpContext.Request.Cookies.ContainsKey("refresh_token"))
+            if (!HttpContext.Request.Cookies.ContainsKey("refresh_token") || refreshDto.expiredJwtToken == null)
             {
                 throw new SecurityTokenException("One of the tokens doesn't exists. Maybe your refresh token had been expired. Try to go back in the system.");
             }
 
             var refreshCredentials = new RefreshCredentials
             {
-                JwtToken = HttpContext.Request.Cookies["access_token"],
+                JwtToken = refreshDto.expiredJwtToken,
                 RefreshToken = HttpContext.Request.Cookies["refresh_token"]
             };
 
@@ -122,16 +112,7 @@ namespace ForecastAPI.Controllers
             if (tokens == null)
                 return Unauthorized();
             
-            HttpContext.Response.Cookies.Append(
-                "access_token",
-                tokens.JwtToken,
-                new CookieOptions
-                {
-                    HttpOnly = false,
-                    Secure = true, // ssl only / put in *true
-                    SameSite = SameSiteMode.Strict
-                });
-            
+            // Now, an access token stored in localStorage, and at the cookie stored a refresh token only
             HttpContext.Response.Cookies.Append(
                 "refresh_token",
                 tokens.RefreshToken,
@@ -143,18 +124,17 @@ namespace ForecastAPI.Controllers
                     Expires = tokens.RefreshTokenExpiryTime // lives while cookie won't be expiring
                 });
 
-            return Ok(new { meassage = "Tokens refreshed successfully." });
+            return Ok(new { meassage = "Tokens refreshed successfully.", access_token = tokens.JwtToken });
         }
 
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            if(HttpContext.Request.Cookies.ContainsKey("access_token")) 
-                HttpContext.Response.Cookies.Delete("access_token");
+            // How, access_token stored in localStorage and, obviously, we don't need to delete it from cookie
             if(HttpContext.Request.Cookies.ContainsKey("refresh_token")) 
                 HttpContext.Response.Cookies.Delete("refresh_token");
             
-            // anyway if cookies doesn't exist - "Ok" status will return
+            // anyway if cookies doesn't exist - "Ok" status will have returned
             return Ok();
         }
     }

@@ -72,7 +72,7 @@ namespace ForecastAPI
                 policy.AllowCredentials() 
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .WithExposedHeaders("X-Pagination") // Allows to send the some custom headers like a "X-Pagination", that declared in AdminController GetAllUsers action
+                    .WithExposedHeaders("X-Pagination", "X-History-Pagination") // Allows to send the some custom headers like a "X-Pagination", that declared in AdminController GetAllUsers action
                     .WithOrigins(Configuration["Frontend:Url"]);
             }));
 
