@@ -9,8 +9,12 @@
         <PackageReference Include="AutoMapper" Version="10.1.1" />
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
+        <PackageReference Include="FluentEmail.Core" Version="3.0.0" />
+        <PackageReference Include="FluentEmail.Razor" Version="3.0.0" />
+        <PackageReference Include="FluentEmail.Smtp" Version="3.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.9" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.9" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.9" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.9">
           <PrivateAssets>all</PrivateAssets>
@@ -31,6 +35,10 @@
       <_ContentIncludedByDefault Remove="DataAccess\DataAccess\obj\DataAccess.csproj.nuget.dgspec.json" />
       <_ContentIncludedByDefault Remove="DataAccess\DataAccess\obj\project.assets.json" />
       <_ContentIncludedByDefault Remove="DataAccess\DataAccess\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="Views\ChangingPasswordLetter.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\RegistrationLetter.cshtml" />
+      <_ContentIncludedByDefault Remove="Emailing\Services\Implementations\Views\ChangingPasswordLetter.cshtml" />
+      <_ContentIncludedByDefault Remove="Emailing\Services\Implementations\Views\RegistrationLetter.cshtml" />
     </ItemGroup>
 
     <ItemGroup>

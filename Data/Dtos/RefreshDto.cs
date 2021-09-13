@@ -2,6 +2,6 @@
 {
     public class RefreshDto
     {
-        public string expiredJwtToken { get; set; }
+        public string ExpiredJwtToken { get; set; }
     }
 }

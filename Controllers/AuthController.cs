@@ -3,6 +3,7 @@ using AutoMapper;
 using ForecastAPI.Data.Dtos;
 using ForecastAPI.Data.Entities;
 using ForecastAPI.Data.Enums;
+using ForecastAPI.Emailing.Services.Interfaces;
 using ForecastAPI.Handlers;
 using ForecastAPI.Repositories.Interfaces;
 using ForecastAPI.Security.Models;
@@ -20,12 +21,14 @@ namespace ForecastAPI.Controllers
     {
         private readonly ISecurityService _securityService;
         private readonly IUserRepository _userRepository;
+        private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
         
-        public AuthController(ISecurityService securityService, IUserRepository userRepository, IMapper mapper)
+        public AuthController(ISecurityService securityService, IUserRepository userRepository, IMapper mapper, IEmailService emailService)
         {
             _securityService = securityService;
             _userRepository = userRepository;
+            _emailService = emailService;
             _mapper = mapper;
         }
 
@@ -86,7 +89,9 @@ namespace ForecastAPI.Controllers
                 Password = hashedPassword,
                 Role = RoleTypes.SystemUser
             };
-                
+            
+            await _emailService.SendRegistrationEmailAsync(userInstanceToSaveInDb.Name);
+            
             await _userRepository.CreateAsync(userInstanceToSaveInDb);
             await _userRepository.SaveChangesAsync();
 
@@ -96,14 +101,14 @@ namespace ForecastAPI.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh(RefreshDto refreshDto)
         {
-            if (!HttpContext.Request.Cookies.ContainsKey("refresh_token") || refreshDto.expiredJwtToken == null)
+            if (!HttpContext.Request.Cookies.ContainsKey("refresh_token") || refreshDto.ExpiredJwtToken == null)
             {
                 throw new SecurityTokenException("One of the tokens doesn't exists. Maybe your refresh token had been expired. Try to go back in the system.");
             }
 
             var refreshCredentials = new RefreshCredentials
             {
-                JwtToken = refreshDto.expiredJwtToken,
+                JwtToken = refreshDto.ExpiredJwtToken,
                 RefreshToken = HttpContext.Request.Cookies["refresh_token"]
             };
 

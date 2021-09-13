@@ -10,18 +10,15 @@ namespace ForecastAPI.Repositories.Implementations
 {
     public class HistoryRepository: BaseRepository<History>, IHistoryRepository
     {
-        private readonly ApplicationDbContext _context;
         public HistoryRepository(ApplicationDbContext context) : 
             base(context)
         {
-            _context = context;
         }
 
-
-        public PagedList<History> PaginateHistory(IEnumerable<History> history, HistoryRequestParameters historyRequestParameters)
+        public PagedList<History> PaginateHistory(IEnumerable<History> history, HistoryRequestPaginationParameters historyRequestPaginationParameters)
         {
-            return PagedList<History>.ToPagedList(history, historyRequestParameters.PageNumber,
-                historyRequestParameters.PageSize);
+            return PagedList<History>.ToPagedList(history, historyRequestPaginationParameters.PageNumber,
+                historyRequestPaginationParameters.PageSize);
         }
     }
 }

@@ -1,6 +1,10 @@
 using System.Reflection;
 using ForecastAPI.Data;
 using ForecastAPI.Data.Common.Settings;
+using ForecastAPI.Emailing.Extensions;
+using ForecastAPI.Emailing.Services.Implementations;
+using ForecastAPI.Emailing.Services.Interfaces;
+using ForecastAPI.Emailing.Settings;
 using ForecastAPI.Handlers;
 using ForecastAPI.Repositories.Implementations;
 using ForecastAPI.Repositories.Interfaces;
@@ -18,6 +22,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using RazorLight.Extensions;
 
 namespace ForecastAPI
 {
@@ -33,6 +38,10 @@ namespace ForecastAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var emailingSettings = new FluentEmailSettings();
+            Configuration.GetSection("FluentEmailSettings").Bind(emailingSettings);
+            services.AddSingleton(emailingSettings);
+            
             var forecastSettings = new ForecastSettings();
             Configuration.GetSection("ForecastSettings").Bind(forecastSettings);
             services.AddSingleton(forecastSettings);
@@ -50,7 +59,8 @@ namespace ForecastAPI
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddScoped<ValidationUserExistingFilter>();
             services.AddScoped<ValidationRequestFilter>();
-            
+
+            services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IClaimsService, ClaimsService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -59,7 +69,7 @@ namespace ForecastAPI
             services.AddScoped<IHistoryRepository, HistoryRepository>();
             services.AddSecurityServices();
             services.AddHttpContextAccessor();
-            
+
             services.AddControllers(opt =>
             {
                 // registered the filter globally
@@ -80,6 +90,7 @@ namespace ForecastAPI
                 options.UseSqlServer(Configuration.GetConnectionString("ForecastDbConnectionString")));
             
             services.ConfigureJsonWebToken(jwtSettings);
+            services.ConfigureEmailing(emailingSettings);
             
             services.AddSwaggerGen(c =>
             {

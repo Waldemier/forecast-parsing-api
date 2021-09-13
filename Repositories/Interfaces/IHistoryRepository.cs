@@ -8,6 +8,6 @@ namespace ForecastAPI.Repositories.Interfaces
 {
     public interface IHistoryRepository: IBaseRepository<History>
     {
-        PagedList<History> PaginateHistory(IEnumerable<History> history, HistoryRequestParameters historyRequestParameters);
+        PagedList<History> PaginateHistory(IEnumerable<History> history, HistoryRequestPaginationParameters historyRequestPaginationParameters);
     }
 }

@@ -24,10 +24,10 @@ namespace ForecastAPI.Repositories.Implementations
         public bool CheckUserExistsByEmail(string email) =>
             CheckByCondition(x => x.Email.Equals(email));
 
-        public async Task<PagedList<User>> GetAllUsers(UsersRequestParameters usersRequestParameters)
+        public async Task<PagedList<User>> GetAllUsers(UsersRequestPaginationParameters usersRequestPaginationParameters)
         {
             var users =  await GetAll().ToListAsync();
-            return PagedList<User>.ToPagedList(users, usersRequestParameters.PageNumber, usersRequestParameters.PageSize);
+            return PagedList<User>.ToPagedList(users, usersRequestPaginationParameters.PageNumber, usersRequestPaginationParameters.PageSize);
         }
 
         public bool CheckUserExistsById(Guid Id) =>

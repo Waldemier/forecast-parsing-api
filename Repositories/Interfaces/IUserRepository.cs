@@ -12,7 +12,7 @@ namespace ForecastAPI.Repositories.Interfaces
         Task<User> GetByEmailAsync(string email);
         bool CheckUserExistsByEmail(string email);
         Task<User> GetInstanceByIdAsync(Guid Id);
-        Task<PagedList<User>> GetAllUsers(UsersRequestParameters usersRequestParameters);
+        Task<PagedList<User>> GetAllUsers(UsersRequestPaginationParameters usersRequestPaginationParameters);
         bool CheckUserExistsById(Guid Id);
         Task LoadHistoryForSpecificUserAsync(User user);
         Task CreateANewUserInstance(User user);

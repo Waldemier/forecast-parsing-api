@@ -7,7 +7,7 @@ namespace ForecastAPI.Data.Common.Pagination
     public class PagedList<T> : List<T> where T: class
     {
         public string MetaData { get; }
-        public PagedList(IEnumerable<T> items, int itemsAmount, int pageNumber, int pageSize)
+        private PagedList(IEnumerable<T> items, int itemsAmount, int pageNumber, int pageSize)
         {
             MetaData = new MetaData()
             {

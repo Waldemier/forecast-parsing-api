@@ -28,9 +28,9 @@ namespace ForecastAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUsers([FromQuery]UsersRequestParameters usersRequestParameters) // ?PageSize=..&PageNumber=..
+        public async Task<IActionResult> GetAllUsers([FromQuery]UsersRequestPaginationParameters usersRequestPaginationParameters) // ?PageSize=..&PageNumber=..
         {
-            var users = await _userRepository.GetAllUsers(usersRequestParameters);
+            var users = await _userRepository.GetAllUsers(usersRequestPaginationParameters);
             HttpContext.Response.Headers.Add("X-Pagination", users.MetaData);
             
             var userDtos = _mapper.Map<IEnumerable<UserToResponseDto>>(users);
@@ -39,11 +39,11 @@ namespace ForecastAPI.Controllers
         }
 
         [HttpGet("{userId:Guid}"), ServiceFilter(typeof(ValidationUserExistingFilter))]
-        public async Task<IActionResult> GetHistoryForSpecificUser(Guid userId, [FromQuery] HistoryRequestParameters historyRequestParameters)
+        public async Task<IActionResult> GetHistoryForSpecificUser(Guid userId, [FromQuery] HistoryRequestPaginationParameters historyRequestPaginationParameters)
         {
             var user = await _userRepository.GetInstanceByIdAsync(userId);
             await _userRepository.LoadHistoryForSpecificUserAsync(user);
-            var paginatedHistory = _historyRepository.PaginateHistory(user.History, historyRequestParameters);
+            var paginatedHistory = _historyRepository.PaginateHistory(user.History, historyRequestPaginationParameters);
             
             HttpContext.Response.Headers.Add("X-History-Pagination", paginatedHistory.MetaData);
             

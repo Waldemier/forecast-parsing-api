@@ -15,12 +15,10 @@ namespace ForecastAPI.Services.Implementations
     public class ForecastApiService: IForecastApiService
     {
         private readonly ForecastSettings _forecastSettings;
-        private readonly IHistoryRepository _historyRepository;
         private readonly ILogger<ForecastApiService> _logger;
-        public ForecastApiService(ForecastSettings forecastSettings, IHistoryRepository historyRepository, ILogger<ForecastApiService> logger)
+        public ForecastApiService(ForecastSettings forecastSettings, ILogger<ForecastApiService> logger)
         {
             _forecastSettings = forecastSettings;
-            _historyRepository = historyRepository;
             _logger = logger;
         }
         

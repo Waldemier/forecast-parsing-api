@@ -19,7 +19,7 @@ namespace ForecastAPI.Security.Services.Implementations
         {
             var userIdFromClaims = _httpContextAccessor?.HttpContext?.User.Claims
                 .SingleOrDefault(c => c.Type.Equals("Id"));
-        
+            
             if (userIdFromClaims is null)
                 throw new SecurityTokenException("Some property in the token claims doesn't exist.");
 
