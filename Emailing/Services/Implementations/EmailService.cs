@@ -21,15 +21,15 @@ namespace ForecastAPI.Emailing.Services.Implementations
             _fluentEmailSettings = fluentEmailSettings;
         }
 
-        public async Task<SendResponse> SendRegistrationEmailAsync(string userEmail)
+        public async Task<SendResponse> SendRegistrationEmailAsync(string userEmail, string userName)
         {
             var randomVerifyingString = GenerateRandomString();
-            var letter = new RegistrationLetter(userEmail, randomVerifyingString);
+            var letter = new RegistrationLetter(userName, randomVerifyingString);
                 
             return await _fluentEmail
                 .To(userEmail)
                 .Subject("Registration confirm")
-                .UsingTemplateFromFile($"{Directory.GetCurrentDirectory()}\\Views\\RegistrationLetter.cshtml", letter)
+                .UsingTemplateFromEmbedded("ForecastAPI.Views.RegistrationLetter.cshtml", letter, Assembly.GetAssembly(typeof(Startup)))
                 .SendAsync();
         }
             

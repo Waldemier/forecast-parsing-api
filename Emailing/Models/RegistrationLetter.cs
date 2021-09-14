@@ -2,11 +2,11 @@
 {
     public class RegistrationLetter
     {
-        public string Name { get; set; }
+        public string UserName { get; set; }
         public string VerifyLink { get; set; }
-        public RegistrationLetter(string name, string verifyLink)
+        public RegistrationLetter(string userName, string verifyLink)
         {
-            Name = name;
+            UserName = userName;
             VerifyLink = verifyLink;
         }
     }

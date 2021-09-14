@@ -6,7 +6,7 @@ namespace ForecastAPI.Emailing.Services.Interfaces
 {
     public interface IEmailService
     {
-        Task<SendResponse> SendRegistrationEmailAsync(string userEmail);
+        Task<SendResponse> SendRegistrationEmailAsync(string userEmail, string userName);
         Task<SendResponse> SendChangingPasswordEmailAsync(string userEmail);
     }
 }

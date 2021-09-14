@@ -108,8 +108,10 @@ namespace ForecastAPI
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ForecastAPI v1"));
             }
 
+            app.UseStaticFiles();
+            
             app.UseHttpsRedirection();
-
+            
             app.UseRouting();
 
             app.UseCors("CorsPolicy");

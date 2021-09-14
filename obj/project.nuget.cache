@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "+mRnGC/Ho0vfvjpfS3uz+rqJSQWVkuW/rImD6VDOFlFC78tk2MPituA1vnQ/bRiS4LNNXYgB9rT6kQSgzWa83g==",
+  "dgSpecHash": "FPb3V9isExm90qD7uJl38YB/8hl5f+fmqz7rsig0EWnW3uMfbCV/EeIgwyhiRn91b0zenXNB4T1TWQEz5De6AQ==",
   "success": true,
   "projectFilePath": "E:\\VSProjects\\ForecastAPI\\ForecastAPI.csproj",
   "expectedPackageFiles": [
@@ -38,6 +38,7 @@
     "C:\\Users\\User\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\5.0.0\\microsoft.extensions.dependencyinjection.abstractions.5.0.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.extensions.dependencymodel\\5.0.0\\microsoft.extensions.dependencymodel.5.0.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.extensions.fileproviders.abstractions\\5.0.0\\microsoft.extensions.fileproviders.abstractions.5.0.0.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\microsoft.extensions.fileproviders.embedded\\5.0.9\\microsoft.extensions.fileproviders.embedded.5.0.9.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.extensions.fileproviders.physical\\5.0.0\\microsoft.extensions.fileproviders.physical.5.0.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.extensions.filesystemglobbing\\5.0.0\\microsoft.extensions.filesystemglobbing.5.0.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.extensions.logging\\5.0.0\\microsoft.extensions.logging.5.0.0.nupkg.sha512",

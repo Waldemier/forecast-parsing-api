@@ -213,7 +213,6 @@ E:\VSProjects\ForecastAPI\bin\Debug\net5.0\refs\Microsoft.Extensions.Diagnostics
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\refs\Microsoft.Extensions.Diagnostics.HealthChecks.dll
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\refs\Microsoft.Extensions.FileProviders.Abstractions.dll
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\refs\Microsoft.Extensions.FileProviders.Composite.dll
-E:\VSProjects\ForecastAPI\bin\Debug\net5.0\refs\Microsoft.Extensions.FileProviders.Embedded.dll
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\refs\Microsoft.Extensions.FileProviders.Physical.dll
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\refs\Microsoft.Extensions.FileSystemGlobbing.dll
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\refs\Microsoft.Extensions.Hosting.Abstractions.dll
@@ -399,3 +398,4 @@ E:\VSProjects\ForecastAPI\bin\Debug\net5.0\refs\System.Xml.XPath.dll
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\refs\System.Xml.XPath.XDocument.dll
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\refs\WindowsBase.dll
 E:\VSProjects\ForecastAPI\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.dll
+E:\VSProjects\ForecastAPI\bin\Debug\net5.0\Microsoft.Extensions.FileProviders.Embedded.dll

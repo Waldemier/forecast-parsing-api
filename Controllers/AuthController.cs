@@ -90,7 +90,7 @@ namespace ForecastAPI.Controllers
                 Role = RoleTypes.SystemUser
             };
             
-            await _emailService.SendRegistrationEmailAsync(userInstanceToSaveInDb.Name);
+            await _emailService.SendRegistrationEmailAsync(userInstanceToSaveInDb.Email, userInstanceToSaveInDb.Name);
             
             await _userRepository.CreateAsync(userInstanceToSaveInDb);
             await _userRepository.SaveChangesAsync();
