@@ -1,6 +1,7 @@
 using System.Reflection;
 using ForecastAPI.Data;
 using ForecastAPI.Data.Common.Settings;
+using ForecastAPI.Data.Entities;
 using ForecastAPI.Emailing.Extensions;
 using ForecastAPI.Emailing.Services.Implementations;
 using ForecastAPI.Emailing.Services.Interfaces;
@@ -14,6 +15,7 @@ using ForecastAPI.Security.Services.Interfaces;
 using ForecastAPI.Security.Settings;
 using ForecastAPI.Services;
 using ForecastAPI.Services.Implementations;
+using ForecastAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -62,6 +64,11 @@ namespace ForecastAPI
 
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IClaimsService, ClaimsService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITemporaryTokensService, TemporaryTokenService>();
+
+            services.AddScoped<IVerifyPasswordRepository, VerifyPasswordRepository>();
+            services.AddScoped<IRegistrationConfirmRepository, RegistrationConfirmRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IForecastApiService, ForecastApiService>();

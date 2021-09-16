@@ -10,6 +10,7 @@ namespace ForecastAPI.Profiles
         {
             CreateMap<User, UserToResponseDto>();
             CreateMap<UserToUpdateDto, User>();
+            CreateMap<User, UserForMailDto>();
         }
     }
 }

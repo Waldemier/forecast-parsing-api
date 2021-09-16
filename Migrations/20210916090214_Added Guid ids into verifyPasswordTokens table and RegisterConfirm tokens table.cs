@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ForecastAPI.Migrations
 {
-    public partial class IndividualuserhistoryaddedtheUserIdpropertyintoHistory : Migration
+    public partial class AddedGuididsintoverifyPasswordTokenstableandRegisterConfirmtokenstable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -63,6 +63,45 @@ namespace ForecastAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "RegisterConfirms",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RegisterConfirms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RegisterConfirms_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VerifyPasswords",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VerifyPasswords", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VerifyPasswords_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_History_UserId",
                 table: "History",
@@ -81,9 +120,35 @@ namespace ForecastAPI.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_RegisterConfirms_Token",
+                table: "RegisterConfirms",
+                column: "Token",
+                unique: true,
+                filter: "[Token] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RegisterConfirms_UserId",
+                table: "RegisterConfirms",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VerifyPasswords_Token",
+                table: "VerifyPasswords",
+                column: "Token",
+                unique: true,
+                filter: "[Token] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VerifyPasswords_UserId",
+                table: "VerifyPasswords",
+                column: "UserId",
                 unique: true);
         }
 
@@ -94,6 +159,12 @@ namespace ForecastAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "RegisterConfirms");
+
+            migrationBuilder.DropTable(
+                name: "VerifyPasswords");
 
             migrationBuilder.DropTable(
                 name: "Users");

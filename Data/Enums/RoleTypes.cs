@@ -3,6 +3,7 @@
     public enum RoleTypes
     {
         Admin,
-        SystemUser
+        SystemUser,
+        UnconfirmedUser
     }
 }

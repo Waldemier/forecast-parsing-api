@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ForecastAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210908095640_Individual user history (added the UserId property into History)")]
-    partial class IndividualuserhistoryaddedtheUserIdpropertyintoHistory
+    [Migration("20210916090214_Added Guid ids into verifyPasswordTokens table and RegisterConfirm tokens table")]
+    partial class AddedGuididsintoverifyPasswordTokenstableandRegisterConfirmtokenstable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -74,6 +74,30 @@ namespace ForecastAPI.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("ForecastAPI.Data.Entities.RegisterConfirm", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique()
+                        .HasFilter("[Token] IS NOT NULL");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("RegisterConfirms");
+                });
+
             modelBuilder.Entity("ForecastAPI.Data.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -105,6 +129,33 @@ namespace ForecastAPI.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("ForecastAPI.Data.Entities.VerifyPassword", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ExpiryTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique()
+                        .HasFilter("[Token] IS NOT NULL");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("VerifyPasswords");
+                });
+
             modelBuilder.Entity("ForecastAPI.Data.Entities.History", b =>
                 {
                     b.HasOne("ForecastAPI.Data.Entities.User", "User")
@@ -127,9 +178,35 @@ namespace ForecastAPI.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ForecastAPI.Data.Entities.RegisterConfirm", b =>
+                {
+                    b.HasOne("ForecastAPI.Data.Entities.User", "User")
+                        .WithOne("RegisterConfirm")
+                        .HasForeignKey("ForecastAPI.Data.Entities.RegisterConfirm", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ForecastAPI.Data.Entities.VerifyPassword", b =>
+                {
+                    b.HasOne("ForecastAPI.Data.Entities.User", "User")
+                        .WithOne("VerifyPassword")
+                        .HasForeignKey("ForecastAPI.Data.Entities.VerifyPassword", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ForecastAPI.Data.Entities.User", b =>
                 {
                     b.Navigation("History");
+
+                    b.Navigation("RegisterConfirm");
+
+                    b.Navigation("VerifyPassword");
                 });
 #pragma warning restore 612, 618
         }

@@ -8,7 +8,7 @@ namespace ForecastAPI.Security.Services.Interfaces
 {
     public interface ISecurityService
     {
-        Task<AuthenticateCustom> Authenticate(User user);
+        Task<AuthenticateCustom> Authenticate(string email);
         Task<AuthenticateCustom> Refresh(RefreshCredentials refreshCredentials);
     }
 }

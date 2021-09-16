@@ -10,6 +10,8 @@ using ForecastAPI.Repositories.Interfaces;
 using ForecastAPI.Security.Models;
 using ForecastAPI.Security.Services.Interfaces;
 using ForecastAPI.Security.Settings;
+using ForecastAPI.Services;
+using ForecastAPI.Services.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Extensions;
 
@@ -30,8 +32,9 @@ namespace ForecastAPI.Security.Services.Implementations
             _userRepository = userRepository;
         }
         
-        public async Task<AuthenticateCustom> Authenticate(User user)
+        public async Task<AuthenticateCustom> Authenticate(string email)
         {
+            var user = await _userRepository.GetByEmail(email);
             var jwtToken = JsonWebTokenGenerator(user);
             var refreshToken = RefreshTokenGenerator();
 
@@ -117,7 +120,7 @@ namespace ForecastAPI.Security.Services.Implementations
                 throw new SecurityTokenException("Expiration time have expired.");
             }
 
-            var userInstance = await _userRepository.GetInstanceByIdAsync(Id);
+            var userInstance = await _userRepository.GetInstanceById(Id);
             
             return await Authenticate(userInstance, claimsPrincipal.Claims.ToArray());
         }
@@ -185,5 +188,7 @@ namespace ForecastAPI.Security.Services.Implementations
 
             return Convert.ToBase64String(randomNumber); // after that array transforms to string
         }
+        
+        
     }
 }

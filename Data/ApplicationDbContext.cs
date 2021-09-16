@@ -4,17 +4,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ForecastAPI.Data
 {
-    public class ApplicationDbContext: DbContext
+    public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) :
             base(options)
         {
-            
+
         }
 
         public DbSet<History> History { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<RegisterConfirm> RegisterConfirms { get; set; }
+        public DbSet<VerifyPassword> VerifyPasswords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,6 +70,27 @@ namespace ForecastAPI.Data
                 entity.HasOne(e => e.User)
                     .WithOne()
                     .HasForeignKey<RefreshToken>(e => e.UserId);
+            });
+
+            modelBuilder.Entity<RegisterConfirm>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.Token)
+                    .IsUnique();
+                entity.HasOne(e => e.User)
+                    .WithOne(u => u.RegisterConfirm)
+                    .HasForeignKey<RegisterConfirm>(e => e.UserId);
+            });
+            
+            modelBuilder.Entity<VerifyPassword>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.Token)
+                    .IsUnique();
+                entity.Property(e => e.ExpiryTime);
+                entity.HasOne(e => e.User)
+                    .WithOne(u => u.VerifyPassword)
+                    .HasForeignKey<VerifyPassword>(e => e.UserId);
             });
             
             modelBuilder.ApplyConfiguration(new SeedUsers());

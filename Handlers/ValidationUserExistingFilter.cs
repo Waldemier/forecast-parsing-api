@@ -21,7 +21,7 @@ namespace ForecastAPI.Handlers
             var action = context.RouteData.Values["action"];
 
             var userId = (Guid)context.ActionArguments["userId"];
-            var userInstance = await _userRepository.GetInstanceByIdAsync(userId);
+            var userInstance = await _userRepository.GetInstanceById(userId);
 
             if (userInstance is null)
             {

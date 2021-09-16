@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ForecastAPI.Data;
 using ForecastAPI.Data.Common.Pagination;
 using ForecastAPI.Data.Dtos;
 using ForecastAPI.Data.Entities;
+using ForecastAPI.Data.Enums;
 using ForecastAPI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,8 +19,14 @@ namespace ForecastAPI.Repositories.Implementations
         {
             _context = context;
         }
-        
-        public async Task<User> GetByEmailAsync(string email) =>
+
+        public async Task ChangeRoleById(Guid userId, RoleTypes role)
+        {
+            var userInstance = await GetByCondition(x => x.Id.Equals(userId)).SingleOrDefaultAsync();
+            userInstance.Role = role;
+        }
+
+        public async Task<User> GetByEmail(string email) =>
             await GetByCondition(x => x.Email.Equals(email)).SingleOrDefaultAsync();
         
         public bool CheckUserExistsByEmail(string email) =>
@@ -33,7 +41,7 @@ namespace ForecastAPI.Repositories.Implementations
         public bool CheckUserExistsById(Guid Id) =>
             CheckByCondition(x => x.Id.Equals(Id));
         
-        public async Task<User> GetInstanceByIdAsync(Guid Id) =>
+        public async Task<User> GetInstanceById(Guid Id) =>
             await GetByCondition(x => x.Id.Equals(Id)).SingleOrDefaultAsync();
 
         public async Task CreateANewUserInstance(User user) =>
@@ -43,12 +51,25 @@ namespace ForecastAPI.Repositories.Implementations
         /// Load history by explicit loading approach
         /// </summary>
         /// <param name="user">Instance type of User</param>
-        public async Task LoadHistoryForSpecificUserAsync(User user) =>
+        public async Task LoadHistoryForSpecificUser(User user) =>
             await _context.Entry(user)
                 .Collection(c => c.History)
                 .Query()
                 .LoadAsync();
 
+        public async Task LoadRegisterConfirmTokenForSpecificUserAsync(User user) =>
+            await _context.Entry(user)
+                .Reference(x => x.RegisterConfirm)
+                .LoadAsync();
+        
+        public async Task LoadVerifyPasswordTokenForSpecificUserAsync(User user) =>
+            await _context.Entry(user)
+                .Reference(x => x.VerifyPassword)
+                .LoadAsync();
+        
         public void DeleteUser(User user) => Remove(user);
+
+        public bool CheckIfUserIsConfirmed(Guid userId) =>
+            CheckByCondition(u => u.Id.Equals(userId) && !u.Role.Equals(RoleTypes.UnconfirmedUser));
     }
 }

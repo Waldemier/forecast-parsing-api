@@ -14,5 +14,7 @@ namespace ForecastAPI.Data.Entities
         public RoleTypes Role { get; set; }
 
         public IEnumerable<History> History { get; set; }
+        public RegisterConfirm RegisterConfirm { get; set; }
+        public VerifyPassword VerifyPassword { get; set; }
     }
 }

@@ -1,14 +1,21 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Threading.Tasks;
 using AutoMapper;
 using ForecastAPI.Data.Dtos;
 using ForecastAPI.Data.Entities;
 using ForecastAPI.Data.Enums;
 using ForecastAPI.Emailing.Services.Interfaces;
 using ForecastAPI.Handlers;
+using ForecastAPI.Helpers;
 using ForecastAPI.Repositories.Interfaces;
 using ForecastAPI.Security.Models;
 using ForecastAPI.Security.Services.Interfaces;
+using ForecastAPI.Services;
+using ForecastAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -20,37 +27,32 @@ namespace ForecastAPI.Controllers
     public class AuthController: ControllerBase
     {
         private readonly ISecurityService _securityService;
-        private readonly IUserRepository _userRepository;
-        private readonly IEmailService _emailService;
-        private readonly IMapper _mapper;
-        
-        public AuthController(ISecurityService securityService, IUserRepository userRepository, IMapper mapper, IEmailService emailService)
+        private readonly ITemporaryTokensService _temporaryTokensService;
+        private readonly IUserService _userService;
+        // private readonly ImmutableDictionary<Guid, InnerShortTimeToken> ChangingPasswordProcessDictionary; 
+
+        public AuthController(ISecurityService securityService, IUserService userService, ITemporaryTokensService temporaryTokensService)
         {
             _securityService = securityService;
-            _userRepository = userRepository;
-            _emailService = emailService;
-            _mapper = mapper;
+            _userService = userService;
+            _temporaryTokensService = temporaryTokensService;
+            // ChangingPasswordProcessDictionary = new Dictionary<Guid, InnerShortTimeToken>().ToImmutableDictionary();
         }
 
         [HttpPost("login"), ServiceFilter(typeof(ValidationRequestFilter))]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var userExisting = _userRepository.CheckUserExistsByEmail(loginDto.Email);
+            var userExisting = _userService.CheckUserExistsByEmail(loginDto.Email);
 
             if (!userExisting)
-            {
                return new NotFoundObjectResult("Wrong received data. User with current email doesn't exist.");
-            }
 
-            var userInstance = await _userRepository.GetByEmailAsync(loginDto.Email);
-            var passwordValid = BCrypt.Net.BCrypt.Verify(loginDto.Password, userInstance.Password);
+            var isPasswordValid = await _userService.VerifyPasswordByUserEmail(loginDto.Email, loginDto.Password);
             
-            if (!passwordValid)
-            {
+            if (!isPasswordValid)
                 return new BadRequestObjectResult("Incorrect wrote data.");
-            }
-                
-            var tokens = await _securityService.Authenticate(userInstance);
+            
+            var tokens = await _securityService.Authenticate(loginDto.Email);
 
             if (tokens == null)
                 return Unauthorized();
@@ -67,7 +69,7 @@ namespace ForecastAPI.Controllers
                     Expires = tokens.RefreshTokenExpiryTime // lives while cookie won't be expiring
                 });
 
-            var userToResponse = _mapper.Map<UserToResponseDto>(userInstance);
+            var userToResponse = await _userService.GetByEmail(loginDto.Email);
             
             return Ok(new {  message = "You logged successfully.", access_token = tokens.JwtToken, user = JsonConvert.SerializeObject(userToResponse) });
         }
@@ -75,7 +77,7 @@ namespace ForecastAPI.Controllers
         [HttpPost("register"), ServiceFilter(typeof(ValidationRequestFilter))]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            var userExisting = _userRepository.CheckUserExistsByEmail(registerDto.Email);
+            var userExisting = _userService.CheckUserExistsByEmail(registerDto.Email);
             if (userExisting)
             {
                 return new BadRequestObjectResult("User with current email already exist.");
@@ -87,19 +89,88 @@ namespace ForecastAPI.Controllers
                 Name = registerDto.Name,
                 Email = registerDto.Email,
                 Password = hashedPassword,
-                Role = RoleTypes.SystemUser
+                Role = RoleTypes.UnconfirmedUser
             };
             
-            await _emailService.SendRegistrationEmailAsync(userInstanceToSaveInDb.Email, userInstanceToSaveInDb.Name);
-            
-            await _userRepository.CreateAsync(userInstanceToSaveInDb);
-            await _userRepository.SaveChangesAsync();
+            await _userService.CreateUserAndSendEmail(userInstanceToSaveInDb);
 
             return Created(string.Empty, new { message = "User created successfully." });
         }
 
+        [HttpPost("confirm/{registerToken}")]
+        public async Task<IActionResult> RegisterConfirmation(string registerToken)
+        {
+            var response = await _temporaryTokensService.ConfirmTheRegistration(registerToken);
+            
+            if (!response.HasValue)
+                throw new RegisterConfirmationException("Confirmation token is invalid.");
+            
+            await _userService.ChangeRoleById(response.Value, RoleTypes.SystemUser);
+            return Ok("An account has confirmed successfully");
+        }
+
+        [HttpPost("forgot")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotResponse forgotResponse)
+        {
+            if (!_userService.CheckUserExistsByEmail(forgotResponse.Email))
+                return BadRequest("User with current email doesn't exist.");
+            
+            await _userService.GenerateForgotTokenAndSendEmail(forgotResponse.Email);
+            
+            return Ok("Forgot password letter has sent successfully");
+        }
+        
+        [HttpPost("verify/{verifyToken}")]
+        public async Task<IActionResult> VerifyForgotPasswordToken(string verifyToken)
+        {
+                var response = await _temporaryTokensService.VerifyForgotPasswordToken(verifyToken);
+            
+            if (!response.HasValue)
+                return BadRequest("Verification token has expired.");
+
+            var shorterToken = await _temporaryTokensService.CreateShorterVerificationToken(response.Value);
+            
+            HttpContext.Response.Cookies.Append(
+                    "shorter_verification_token",
+                    shorterToken.Token,
+                    new CookieOptions()
+                    {
+                        SameSite = SameSiteMode.Strict,
+                        Secure = true,
+                        HttpOnly = true, // Cant be used on the client side (js)
+                        Expires = shorterToken.ExpiryTime
+                    }
+            );
+            
+            return Ok("Now, you can change the password.");
+        }
+        
+        [HttpPost("forgot/change")]
+        public async Task<IActionResult> ChangePassword([FromBody] ForgotPasswordRequest request)
+        {
+            bool cookieResponse = HttpContext.Request.Cookies.TryGetValue("shorter_verification_token", out string shorterToken);
+            
+            if (!cookieResponse)
+                return BadRequest("Verification token doesn't exist or it has expired.");
+
+            if (request == null)
+                return BadRequest("Received data is empty");
+            
+            var verifyResponse = await _temporaryTokensService.VerifyShorterVerificationToken(shorterToken);
+
+            if (!verifyResponse.HasValue)
+                return BadRequest("Shorter verification token has expired.");
+            
+            bool changedPasswordResponse = await _userService.ChangePassword(verifyResponse.Value, request.NewlyPassword);
+
+            if (!changedPasswordResponse)
+                return BadRequest("Received newly password is incorrect");
+
+            return Ok("Password has been changed successfully");
+        }
+        
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh(RefreshDto refreshDto)
+        public async Task<IActionResult> Refresh(RefreshDto refreshDto) 
         {
             if (!HttpContext.Request.Cookies.ContainsKey("refresh_token") || refreshDto.ExpiredJwtToken == null)
             {
